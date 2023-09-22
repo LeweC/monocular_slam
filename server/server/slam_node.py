@@ -8,7 +8,7 @@ import std_msgs.msg as std_msgs
 from cv_bridge import CvBridge  # Package to convert between ROS and OpenCV Images
 import cv2
 import torch  # ToDO: Make sure to install Torch
-
+from slam_interfaces import FloatArray, FloatList
 import numpy as np
 
 
@@ -17,7 +17,7 @@ class SlamNode(Node):
 
     def __init__(self):
         super().__init__("slam_node")
-        self.odometry_sub = self.create_subscription(std_msgs.Int32MultiArray, "robo_pos", self.odometry_callback, 10)
+        self.odometry_sub = self.create_subscription(FloatArray, "robo_pos", self.odometry_callback, 10)
         self.image_sub = self.create_subscription(sensor_msgs.Image, "image_raw", self.image_callback, 10)
         self.pcd_publisher = self.create_publisher(sensor_msgs.PointCloud2, "pcl", 10)
         self.br = CvBridge()
@@ -38,12 +38,14 @@ class SlamNode(Node):
 
     def set_new_pose(self, robo_pos):
         """ToDo DocString"""
-        self.pose = robo_pos
+        self.pose = []
+        for lst in robo_pos.lists:
+            for e in lst.elements:
+                self.pose.append(e)
 
     def odometry_callback(self, msg):
         """ToDo DocString"""
-        pose = msg.data
-        self.set_new_pose(pose)
+        self.set_new_pose(msg)
 
     def point_cloud(self, points, parent_frame):
         """ToDo DocString"""

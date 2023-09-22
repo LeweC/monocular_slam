@@ -4,7 +4,8 @@ import time
 import rclpy
 from rclpy.node import Node
 
-from std_msgs.msg import String, Int32MultiArray
+from std_msgs.msg import String
+from slam_interfaces import FloatArray, FloatList
 
 import numpy as np
 
@@ -34,7 +35,7 @@ class DirectionSubscriber(Node):
     def __init__(self):
         super().__init__("direction_subscriber")
         self.subscription = self.create_subscription(String, "cmd_vel", self.listener_callback, 10)
-        self.publisher = self.create_publisher(Int32MultiArray, "robo_pos", 10)
+        self.publisher = self.create_publisher(FloatArray, "robo_pos", 10)
         # Start motor
         dxl.set_torque_enabled(motor_ids, True)
         # tell the motor to move to zero-position
@@ -129,7 +130,12 @@ class DirectionSubscriber(Node):
 
         motor_pos_prev = motor_pos
 
-        self.publisher.publish(motor_pos)
+        float_array = FloatArray()
+        for i in range(len(motor_pos)):
+            float_list = FloatList()
+            float_list.elements = motor_pos[i]
+            float_array.lists[i] = float_list
+        self.publisher.publish(float_array)
 
 
 def main(args=None):
