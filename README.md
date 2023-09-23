@@ -7,6 +7,12 @@ Welcome to the Monocular SLAM with MIDAS Depth Estimation on ROS2 repository! Th
 
 Monocular SLAM is a fundamental technology in robotics and autonomous navigation. It allows a robot to understand its environment and estimate its own position and orientation within an environment using only a single camera. This project uses MIDAS, a powerful deep learning-based depth estimation model, to generate dense depth maps from the camera's RGB images. These depth maps are then integrated into ROS2 to enable real-time SLAM, allowing our hardware platform to navigate and interact with its environment.
 
+## Import information for the submission
+Due to the fact that we used the ROS framework and some open source packages, there are a number of files that we did not create ourselves. For your convenience, here are the files that are important for submission and grading:
+- [robot_direction_node](robot_control/robot_control/robot_direction_node.py)
+- [server_direction_node.py](server/server/server_direction_node.py)
+- [server_node.py](server/server/slam_node.py)
+
 ## Key features
 
 **MIDAS Depth Estimation**: 
@@ -37,5 +43,3 @@ We took four images manually over an 80-degree span and used the same script to 
 <img src="docs/001.PNG" width="500"> <img src="docs/002.PNG" width="500"> <img src="docs/003.PNG" width="500"> <img src="docs/004.PNG" width="500">\
 Later we read this file into the visualisation script. There we hard-coded the angle that each image was taken from, did some triangulation, and sent the resulting point cloud to RViz.\
 <img src="docs/DepthMap.PNG">\
-
-
