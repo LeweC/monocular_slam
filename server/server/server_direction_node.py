@@ -85,8 +85,10 @@ def main():
     msg = String()
     try:
         while True:
-            key = get_key(settings)
             msg.data = "Null"
+            key = get_key(settings)
+            print(type(key))
+            
             if key == "\x03":
                 break
             elif key == "A":
@@ -97,9 +99,10 @@ def main():
                 msg.data = "Right"
             elif key == "D":
                 msg.data = "Left"
-
-            if msg.data != "Null":
-                pub.publish(msg)
+            else:
+                msg.data = "Null"
+            pub.publish(msg)
+            
 
     finally:
         pub.publish(msg)

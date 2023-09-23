@@ -31,18 +31,14 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <chrono>
-#include <string>
-#include <thread>
-#include <vector>
-
-#include "cv_bridge/cv_bridge.h"
-
 #include <camera_info_manager/camera_info_manager.hpp>
-#include <image_publisher/image_publisher.hpp>
-#include <image_transport/image_transport.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <rcl_interfaces/msg/set_parameters_result.hpp>
+
+#include <chrono>
+#include <memory>
+#include <vector>
+#include <string>
+
+#include "image_publisher/image_publisher.hpp"
 
 namespace image_publisher
 {
@@ -50,7 +46,7 @@ namespace image_publisher
 using namespace std::chrono_literals;
 
 ImagePublisher::ImagePublisher(const rclcpp::NodeOptions & options)
-: rclcpp::Node("ImagePublisher", options)
+: Node("ImagePublisher", options)
 {
   pub_ = image_transport::create_camera_publisher(this, "image_raw");
 
@@ -145,7 +141,7 @@ void ImagePublisher::doWork()
     sensor_msgs::msg::Image::SharedPtr out_img =
       cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image_).toImageMsg();
     out_img->header.frame_id = frame_id_;
-    out_img->header.stamp = this->now();
+    out_img->header.stamp = rclcpp::Clock().now();
     camera_info_.header.frame_id = out_img->header.frame_id;
     camera_info_.header.stamp = out_img->header.stamp;
 

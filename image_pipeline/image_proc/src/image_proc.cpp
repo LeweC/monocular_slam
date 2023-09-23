@@ -30,11 +30,18 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <memory>
-
-#include <image_proc/debayer.hpp>
-#include <image_proc/rectify.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <ament_index_cpp/get_resource.hpp>
+#include <rcutils/cmdline_parser.h>
+
+#include <cstring>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
+
+#include "image_proc/debayer.hpp"
+#include "image_proc/rectify.hpp"
 
 int main(int argc, char * argv[])
 {

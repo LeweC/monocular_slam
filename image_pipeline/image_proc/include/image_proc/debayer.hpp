@@ -33,9 +33,16 @@
 #ifndef IMAGE_PROC__DEBAYER_HPP_
 #define IMAGE_PROC__DEBAYER_HPP_
 
-#include <image_transport/image_transport.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/image.hpp>
+#include <image_transport/image_transport.hpp>
+#include <ament_index_cpp/get_resource.hpp>
+
+#include <cstring>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <thread>
 
 namespace image_proc
 {

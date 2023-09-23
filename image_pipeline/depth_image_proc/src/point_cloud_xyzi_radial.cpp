@@ -29,28 +29,31 @@
 // LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-
-#include <functional>
-#include <memory>
-#include <mutex>
-#include <string>
-
-#include "depth_image_proc/visibility.h"
-
-#include <image_transport/image_transport.hpp>
+#include "depth_image_proc/point_cloud_xyzi_radial.hpp"
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <image_transport/image_transport.hpp>
 #include <sensor_msgs/image_encodings.hpp>
-#include <depth_image_proc/point_cloud_xyzi_radial.hpp>
+#include <image_transport/subscriber_filter.hpp>
+#include <message_filters/subscriber.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/exact_time.h>
+#include <image_geometry/pinhole_camera_model.h>
 #include <depth_image_proc/depth_traits.hpp>
 #include <depth_image_proc/conversions.hpp>
+#include <depth_image_proc/visibility.h>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
+
+#include <memory>
+#include <vector>
+#include <string>
+#include <limits>
 
 namespace depth_image_proc
 {
 
 
 PointCloudXyziRadialNode::PointCloudXyziRadialNode(const rclcpp::NodeOptions & options)
-: rclcpp::Node("PointCloudXyziRadialNode", options)
+: Node("PointCloudXyziRadialNode", options)
 {
   // Read parameters
   queue_size_ = this->declare_parameter<int>("queue_size", 5);
@@ -141,26 +144,24 @@ void PointCloudXyziRadialNode::imageCb(
   }
 
   // Convert Depth Image to Pointcloud
-  if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1) {
+  if (depth_msg->encoding == enc::TYPE_16UC1) {
     convertDepthRadial<uint16_t>(depth_msg, cloud_msg, transform_);
-  } else if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
+  } else if (depth_msg->encoding == enc::TYPE_32FC1) {
     convertDepthRadial<float>(depth_msg, cloud_msg, transform_);
   } else {
-    RCLCPP_ERROR(
-      get_logger(), "Depth image has unsupported encoding [%s]", depth_msg->encoding.c_str());
+    RCLCPP_ERROR(logger_, "Depth image has unsupported encoding [%s]", depth_msg->encoding.c_str());
     return;
   }
 
-  if (intensity_msg->encoding == sensor_msgs::image_encodings::MONO8) {
+  if (intensity_msg->encoding == enc::MONO8) {
     convertIntensity<uint8_t>(intensity_msg, cloud_msg);
-  } else if (intensity_msg->encoding == sensor_msgs::image_encodings::MONO16) {
+  } else if (intensity_msg->encoding == enc::MONO16) {
     convertIntensity<uint16_t>(intensity_msg, cloud_msg);
-  } else if (intensity_msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1) {
+  } else if (intensity_msg->encoding == enc::TYPE_16UC1) {
     convertIntensity<uint16_t>(intensity_msg, cloud_msg);
   } else {
     RCLCPP_ERROR(
-      get_logger(), "Intensity image has unsupported encoding [%s]",
-      intensity_msg->encoding.c_str());
+      logger_, "Intensity image has unsupported encoding [%s]", intensity_msg->encoding.c_str());
     return;
   }
 

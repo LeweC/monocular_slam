@@ -1,40 +1,19 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package camera_calibration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-3.0.0 (2022-04-29)
+2.3.0 (2022-12-04)
 ------------------
-* Some small fixes noticed while reviewing.
-* fix premature camera model change in camera_calibration
-* Fix shebang lines for noetic python3
-* Update fisheye distortion model definition
-* Fix calibration yaml formatting (`#580 <https://github.com/ros-perception/image_pipeline/issues/580>`_) (`#585 <https://github.com/ros-perception/image_pipeline/issues/585>`_)
-* updated linear_error function to handle partial board views (`#561 <https://github.com/ros-perception/image_pipeline/issues/561>`_)
-* Fix missing detected checkerboard points (`#558 <https://github.com/ros-perception/image_pipeline/issues/558>`_)
-* ChArUco board, Noetic (`#549 <https://github.com/ros-perception/image_pipeline/issues/549>`_)
-* fix `#503 <https://github.com/ros-perception/image_pipeline/issues/503>`_: (`#545 <https://github.com/ros-perception/image_pipeline/issues/545>`_)
-* Minimal Noetic (`#530 <https://github.com/ros-perception/image_pipeline/issues/530>`_)
-* Apply `#509 <https://github.com/ros-perception/image_pipeline/issues/509>`_ and `#526 <https://github.com/ros-perception/image_pipeline/issues/526>`_ to Noetic Branch (`#528 <https://github.com/ros-perception/image_pipeline/issues/528>`_)
-* Add Fisheye calibration tool (`#440 <https://github.com/ros-perception/image_pipeline/issues/440>`_)
-* camera_calibration: Improve YAML formatting, make config dumping methods static (`#438 <https://github.com/ros-perception/image_pipeline/issues/438>`_)
-* camera_calibration: Fix all-zero distortion coeffs returned for a rational_polynomial model (`#433 <https://github.com/ros-perception/image_pipeline/issues/433>`_)
-* Make sure 'calibrate' button works even if not receiving images anymore
-* Add a comment
-* Replace deque with a modified Queue, add --queue-size param
-* Remove print statement
-* Cosmetic changes
-* Add max-chessboard-speed option to allow more accurate calibration of rolling shutter cameras.
-* revert back
+* Remove random tab
+* Remove lines from cameracalibrator.py and simplify service creation
+* Read camera_names
+* Read params
 * added missing imports
 * update pytest.ini
-* fixes to pass tests
-* rebase change
 * implemented fisheye mono and stereo calibration based on the melodic branch
 * trimmed whitespace at line endings
 * Update camera_calibration setup.cfg to use underscores (`#688 <https://github.com/ros-perception/image_pipeline/issues/688>`_)
+  Fixes a deprecation warning.
 * Add maintainer (`#667 <https://github.com/ros-perception/image_pipeline/issues/667>`_)
 * Fixed crash when rosargs are given (`#597 <https://github.com/ros-perception/image_pipeline/issues/597>`_)
-* Contributors: Chris Lalancette, David Torres Ocaña, DavidTorresOcana, Gabor Soros, Jacob Perron, John Stechschulte, Joshua Whitley, Martin Valgur, Matthijs den Toom, Michael Carroll, Patrick Musau, Photon, Spiros Evangelatos, Victor Dubois, jaiveersinghNV, soeroesg
+  Co-authored-by: Matthijs den Toom <mdentoom@lely.com>
+* Contributors: Gabor Soros, Jacob Perron, Matthijs den Toom, Patrick Musau, Wouter Heerwegh, jaiveersinghNV
 
 2.2.1 (2020-08-27)
 ------------------

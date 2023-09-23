@@ -194,7 +194,7 @@ class TestArtificial(unittest.TestCase):
                 pattern.fill(255)
                 for j in range(1, setup.rows+1):
                     for i in range(1, setup.cols+1):
-                        cv2.circle(pattern, (int(50*i + 25), int(50*j + 25)), 15, (0,0,0), -1)
+                        cv2.circle(pattern, (50*i + 25, 50*j + 25), 15, (0,0,0), -1 )
             elif setup.pattern == Patterns.ACircles:
                 x = 60
                 pattern = numpy.zeros((x*(setup.rows+2), x*(setup.cols+5), 1), numpy.uint8)
@@ -269,28 +269,6 @@ class TestArtificial(unittest.TestCase):
             self.assertTrue(err_intrinsics < setup.K_err,
                          'intrinsics error is %f for resolution i = %d' % (err_intrinsics, i))
             print('intrinsics error is %f' % numpy.linalg.norm(mc.intrinsics - self.k, ord=numpy.inf))
-
-    def test_rational_polynomial_model(self):
-        """Test that the distortion coefficients returned for a rational_polynomial model are not empty."""
-        for i, setup in enumerate(self.setups):
-            board = ChessboardInfo()
-            board.n_cols = setup.cols
-            board.n_rows = setup.rows
-            board.dim = self.board_width_dim
-
-            mc = MonoCalibrator([ board ], flags=cv2.CALIB_RATIONAL_MODEL, pattern=setup.pattern)
-            mc.cal(self.limages[i])
-            self.assertEqual(len(mc.distortion.flat), 8,
-                             'length of distortion coefficients is %d' % len(mc.distortion.flat))
-            self.assertTrue(all(mc.distortion.flat != 0),
-                         'some distortion coefficients are zero: %s' % str(mc.distortion.flatten()))
-            self.assertEqual(mc.as_message().distortion_model, 'rational_polynomial')
-            self.assert_good_mono(mc, self.limages[i], setup.lin_err)
-        
-            yaml = mc.yaml()
-            # Issue #278
-            self.assertIn('cols: 8', yaml)
-
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

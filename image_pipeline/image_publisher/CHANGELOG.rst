@@ -2,15 +2,16 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.0.0 (2022-04-29)
+2.3.0 (2022-12-04)
 ------------------
-* Cleanup image_publisher.
-* image_publisher: Fix out_img timestamp for using with sim time (`#735 <https://github.com/ros-perception/image_pipeline/issues/735>`_)
 * Add retry video capture feature with timeout
+  Retry onInit() if the loading image fails or if the image is empty.
+  This is useful if the stream is lost for a while or if the stream
+  is not ready in the beginning.
 * changes per comments
 * fix for stereo_image_proc_tests
 * Add maintainer (`#667 <https://github.com/ros-perception/image_pipeline/issues/667>`_)
-* Contributors: Ashwin Sushil, Chris Lalancette, Jacob Perron, Nikita Stolyarov, Patrick Musau
+* Contributors: Ashwin Sushil, Jacob Perron, Patrick Musau
 
 2.2.1 (2020-08-27)
 ------------------

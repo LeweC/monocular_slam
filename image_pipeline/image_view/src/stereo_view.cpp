@@ -46,9 +46,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <memory>
-
 #include <rclcpp/rclcpp.hpp>
+
+#include <memory>
 
 #include "image_view/stereo_view_node.hpp"
 
@@ -59,6 +59,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
 
   rclcpp::NodeOptions options;
+  options.append_parameter_override("transport", (argc > 1) ? argv[1] : "raw");
   auto svn = std::make_shared<StereoViewNode>(options);
 
   rclcpp::spin(svn);

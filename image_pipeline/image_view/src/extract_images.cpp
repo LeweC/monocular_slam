@@ -46,11 +46,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <memory>
-
 #include <image_view/extract_images_node.hpp>
 
 #include <rclcpp/rclcpp.hpp>
+
+#include <memory>
 
 int main(int argc, char ** argv)
 {
@@ -59,6 +59,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
 
   rclcpp::NodeOptions options;
+  options.append_parameter_override("transport", (argc > 1) ? argv[1] : "raw");
   auto ein = std::make_shared<ExtractImagesNode>(options);
 
   rclcpp::spin(ein);

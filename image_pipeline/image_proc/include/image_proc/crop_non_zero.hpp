@@ -33,11 +33,14 @@
 #ifndef IMAGE_PROC__CROP_NON_ZERO_HPP_
 #define IMAGE_PROC__CROP_NON_ZERO_HPP_
 
-#include <mutex>
-
+#include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/image.hpp>
+
+#include <thread>
+#include <memory>
+#include <vector>
+#include <string>
 
 namespace image_proc
 {
@@ -55,6 +58,7 @@ private:
   std::mutex connect_mutex_;
 
   image_transport::Publisher pub_;
+
 
   void imageCb(const sensor_msgs::msg::Image::ConstSharedPtr & raw_msg);
 };

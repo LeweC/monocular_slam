@@ -18,6 +18,8 @@ find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
+include_directories(include)
+
 # Build image_transport library
 add_library(${PROJECT_NAME}
   src/camera_common.cpp
@@ -28,40 +30,31 @@ add_library(${PROJECT_NAME}
   src/camera_subscriber.cpp
   src/image_transport.cpp
 )
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-target_include_directories(${PROJECT_NAME} PUBLIC
-  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
-target_link_libraries(${PROJECT_NAME} PUBLIC
-  message_filters::message_filters
-  rclcpp::rclcpp
-  ${sensor_msgs_TARGETS})
-target_link_libraries(${PROJECT_NAME} PRIVATE
-  pluginlib::pluginlib)
 
+ament_target_dependencies(
+  ${PROJECT_NAME}
+  message_filters
+  pluginlib
+  rclcpp
+  sensor_msgs
+)
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 target_compile_definitions(${PROJECT_NAME} PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL")
 
 # Build image_transport_plugins library (raw)
 add_library(${PROJECT_NAME}_plugins
   src/manifest.cpp
 )
-add_library(${PROJECT_NAME}::${PROJECT_NAME}_plugins ALIAS ${PROJECT_NAME}_plugins)
-
-target_link_libraries(${PROJECT_NAME}_plugins PRIVATE
-  ${PROJECT_NAME}
-  pluginlib::pluginlib)
+target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 
 # Build list_transports
 add_executable(list_transports src/list_transports.cpp)
-target_link_libraries(list_transports
-  ${PROJECT_NAME}
-  pluginlib::pluginlib)
+target_link_libraries(list_transports ${PROJECT_NAME})
 
 # Build republish
 add_executable(republish src/republish.cpp)
-target_link_libraries(republish
-  ${PROJECT_NAME}
-  pluginlib::pluginlib)
+target_link_libraries(republish ${PROJECT_NAME})
 
 # Install plugin descriptions
 pluginlib_export_plugin_description_file(image_transport default_plugins.xml)
@@ -73,7 +66,6 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
-install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME})
 
 # Install executables
 install(
@@ -82,21 +74,20 @@ install(
 )
 
 # Install include directories
-install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
 
-ament_export_targets(export_${PROJECT_NAME})
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
 
 ament_export_dependencies(message_filters rclcpp sensor_msgs pluginlib)
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-
-  list(APPEND AMENT_LINT_AUTO_EXCLUDE
-    ament_cmake_cppcheck
-  )
-  ament_lint_auto_find_test_dependencies()
-
-  ament_cppcheck(LANGUAGE "c++")
+  #TODO(ros2) enable linting
+  #find_package(ament_lint_auto REQUIRED)
+  #ament_lint_auto_find_test_dependencies()
 
   find_package(ament_cmake_gtest)
 

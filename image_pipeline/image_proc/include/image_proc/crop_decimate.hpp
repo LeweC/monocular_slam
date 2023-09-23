@@ -33,14 +33,17 @@
 #ifndef IMAGE_PROC__CROP_DECIMATE_HPP_
 #define IMAGE_PROC__CROP_DECIMATE_HPP_
 
-#include <string>
-
-#include "cv_bridge/cv_bridge.h"
-
-#include <image_transport/image_transport.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/msg/image.hpp>
+#include <image_transport/image_transport.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.hpp>
+
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include <thread>
+#include <memory>
+#include <vector>
+#include <string>
 
 namespace image_proc
 {

@@ -1,15 +1,6 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package depth_image_proc
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-3.0.0 (2022-04-29)
+2.3.0 (2022-12-04)
 ------------------
-* Cleanup of depth_image_proc.
 * Fix linker error caused by templating in the conversions.cpp file (`#718 <https://github.com/ros-perception/image_pipeline/issues/718>`_)
-* Port upsampling interpolation from `#363 <https://github.com/ros-perception/image_pipeline/issues/363>`_ to ROS2 (`#692 <https://github.com/ros-perception/image_pipeline/issues/692>`_)
-* Fix uncrustify errors
-* allow loading depth_image_proc::RegisterNode as a component
-* Replace deprecated geometry2 headers
 * Fixed typo in pointcloudxyz launch file
 * use unique_ptrs, remove unused code, add back in missing initMatrix call
 * add xyzrgb radial node
@@ -18,10 +9,15 @@ Changelog for package depth_image_proc
 * Warning instead of fatal error when frames are differents
 * revert a293252
 * Replace deprecated geometry2 headers
+  tf2_geometry_msgs.h was deprecated in https://github.com/ros2/geometry2/pull/418
+  tf2_eigen.h was deprecated in https://github.com/ros2/geometry2/pull/413
 * Add maintainer (`#667 <https://github.com/ros-perception/image_pipeline/issues/667>`_)
 * move to hpp/cpp structure, create conversions file
 * Fix deprecation warning calling declare_parameter
-* Contributors: Chris Lalancette, Evan Flynn, Francisco Martin Rico, Francisco Martín Rico, Harshal Deshpande, Jacob Perron, Joe Schornak, Joseph Schornak, Joshua Whitley, Patrick Musau
+  As of https://github.com/ros2/rclcpp/pull/1522, we must also declare the type of the parameter.
+  We can do this implicitly by providing a default value.
+  Prior to this change, distance\_ was being default-initialized to 0.0 anyways.
+* Contributors: Evan Flynn, Francisco Martin Rico, Francisco Martín Rico, Harshal Deshpande, Jacob Perron, Patrick Musau
 
 2.2.1 (2020-08-27)
 ------------------

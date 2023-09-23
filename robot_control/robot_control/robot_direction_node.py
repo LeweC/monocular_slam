@@ -5,7 +5,7 @@ import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
-from slam_interfaces import FloatArray, FloatList
+from slam_interfaces.msg import FloatArray
 
 import numpy as np
 
@@ -17,7 +17,7 @@ dxl = DynamixelPort()
 # Before we can talk to the Dynamixel motors, we need to establish a USB connection.
 # For this, we need to know the name of the USB device.
 # Example names: Windows: "COM*", Linux: "/dev/ttyUSB*", MacOS: "/dev/tty.usbserial-*"
-dxl.establish_connection(device_name="COM16", baudrate=57600)
+dxl.establish_connection(device_name="/dev/ttyACM0", baudrate=57600)
 # Specify the motor IDs - these need to be set for each motor separately using the Dinamixel-Wizzard program before running this script.
 motor_ids = [1, 2]
 # First, we tell the motor to move at zero-position (value 0)
@@ -38,6 +38,15 @@ class DirectionSubscriber(Node):
         self.publisher = self.create_publisher(FloatArray, "robo_pos", 10)
         # Start motor
         dxl.set_torque_enabled(motor_ids, True)
+        # Car setup
+        #r = 63.8 / 2
+        self.speed = 50
+        self.is_turning = False
+        self.goal_pos = [0, 0]
+        self.world_pos = [0.0, 0.0, 0.0]
+        self.motor_pos_prev = dxl.get_pos(motor_ids, multi_turn=True)
+        step = 1231
+        
         # tell the motor to move to zero-position
         # dxl.set_goal_pos(motor_ids, 40)
         self.pos_prev = dxl.get_pos(motor_ids, multi_turn=True)
@@ -52,8 +61,8 @@ class DirectionSubscriber(Node):
     def calculate_position_orientation(self, motor_pos, motor_pos_prev, orientation_old):
         """ToDo DocString"""
         # Convert encoder values to wheel distances traveled (in centimeters)
-        val_L = motor_pos[0] - motor_pos_prev[0]
-        val_R = motor_pos[1] - motor_pos_prev[1]
+        val_L = motor_pos[0] - self.motor_pos_prev[0]
+        val_R = motor_pos[1] - self.motor_pos_prev[1]
         distance_L = (2 * math.pi * WHEEL_RADIUS * -val_L) / 4095
         distance_R = (2 * math.pi * WHEEL_RADIUS * val_R) / 4095
 
@@ -74,68 +83,66 @@ class DirectionSubscriber(Node):
 
     def drive_in_direction(self, direction: String):
         """ToDo DocString"""
-        r = 63.8 / 2
-        speed = 50
-        is_turning = False
-        goal_pos = [0, 0]
 
-        # step für 50 Grad =
-        # dieser wert wurde gemessemn
-        step = 1231
-        world_pos = [0, 0, 0]
-        motor_pos_prev = dxl.get_pos(motor_ids, multi_turn=True)
-        if goal_pos[1] - dxl.get_pos(motor_ids, multi_turn=True)[1] < 10 and is_turning == True:
+    
+        if self.goal_pos[1] - dxl.get_pos(motor_ids, multi_turn=True)[1] < 10 and self.is_turning == True:
             ...
         else:
-            is_turning = False
+            self.is_turning = False
             if direction == "1":
-                speed = 50
+                self.speed = 50
             elif direction == "2":
-                speed = 100
+                self.speed = 100
             elif direction == "3":
-                speed = 200
+                self.speed = 200
             # read arrow keys and move accordingly
-            if direction == "up":
-                dxl.set_goal_vel(motor_ids, -speed)
-            elif direction == "down":
-                dxl.set_goal_vel(motor_ids, +speed)
-            elif direction == "left":
-                dxl.set_goal_vel(motor_ids, [speed, -speed])
-            elif direction == "right":
-                dxl.set_goal_vel(motor_ids, [-speed, speed])
+            if direction == "Up":
+                dxl.set_goal_vel(motor_ids, -self.speed)
+            elif direction == "Down":
+                dxl.set_goal_vel(motor_ids, +self.speed)
+            elif direction == "Left":
+                dxl.set_goal_vel(motor_ids, [self.speed, -self.speed])
+            elif direction == "Right":
+                dxl.set_goal_vel(motor_ids, [-self.speed, self.speed])
             elif direction == "5":
-                is_turning = True
-                goal_pos = dxl.get_pos(motor_ids, multi_turn=True)
-                goal_pos[0] = goal_pos[0] + step
-                goal_pos[1] = goal_pos[1] - step
-                speed = 20
-                dxl.set_goal_vel(motor_ids, -speed)
+                self.is_turning = True
+                self.goal_pos = dxl.get_pos(motor_ids, multi_turn=True)
+                self.goal_pos[0] = self.goal_pos[0] + step
+                self.goal_pos[1] = self.goal_pos[1] - step
+                self.speed = 20
+                dxl.set_goal_vel(motor_ids, -self.speed)
             else:
                 dxl.set_goal_vel(motor_ids, 0)
-
+            time.sleep(0.1)            
+            dxl.set_goal_vel(motor_ids, 0)
         # get new position
 
         motor_pos = dxl.get_pos(motor_ids, multi_turn=True)
 
-        delta_world_pos = self.calculate_position_orientation(motor_pos, motor_pos_prev, world_pos[2])
+        delta_world_pos = self.calculate_position_orientation(motor_pos, self.motor_pos_prev, self.world_pos[2])
 
         # update x y position and orientation
-        world_pos[0] += delta_world_pos[0]
-        world_pos[1] += delta_world_pos[1]
-        world_pos[2] += delta_world_pos[2]
+        self.world_pos[0] += float(delta_world_pos[0])
+        self.world_pos[1] += float(delta_world_pos[1])
+        self.world_pos[2] += float(delta_world_pos[2])
         # Orientation in range of 360 dagree
-        world_pos[2] = world_pos[2] % 360
+        self.world_pos[2] = float(self.world_pos[2] % 360)
         # print("delta_wolrd_pos", delta_world_pos)
-        print("world_pos: ", world_pos)
+        print("self.world_pos: ", self.world_pos)
 
-        motor_pos_prev = motor_pos
-
+        self.motor_pos_prev = motor_pos
+        
         float_array = FloatArray()
-        for i in range(len(motor_pos)):
-            float_list = FloatList()
-            float_list.elements = motor_pos[i]
-            float_array.lists[i] = float_list
+        float_array.elements = self.world_pos
         self.publisher.publish(float_array)
+        
+        """
+        float_array = FloatList()
+        for i in range(len(self.world_pos)):
+            float_list = FloatArray()
+            float_list.elements = self.world_pos[i]
+            float_array.lists[i] = float_list
+        self.publisher.publish(float_array)"""
 
 
 def main(args=None):

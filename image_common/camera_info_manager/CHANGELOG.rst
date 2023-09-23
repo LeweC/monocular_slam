@@ -2,35 +2,8 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.1.7 (2023-08-14)
+2.4.0 (2022-07-12)
 ------------------
-
-3.1.6 (2023-07-27)
-------------------
-
-3.1.5 (2022-11-16)
-------------------
-* Add alias library targets for all libraries (`#260 <https://github.com/ros-perception/image_common/issues/260>`_)
-* Contributors: Geoffrey Biggs
-
-3.1.4 (2022-03-25)
-------------------
-
-3.1.3 (2022-03-01)
-------------------
-
-3.1.2 (2022-01-14)
-------------------
-* Export a modern CMake target instead of variables and install includes to include/${PROJECT_NAME} (`#218 <https://github.com/ros-perception/image_common/issues/218>`_)
-* Contributors: Shane Loretz
-
-3.1.0 (2021-06-29)
-------------------
-
-3.0.0 (2021-05-26)
-------------------
-* Update maintainers (`#173 <https://github.com/ros-perception/image_common/issues/173>`_)
-* Contributors: Alejandro Hernández Cordero
 
 2.3.0 (2020-05-27)
 ------------------

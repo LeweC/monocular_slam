@@ -30,19 +30,12 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include "image_proc/crop_decimate.hpp"
+
 #include <algorithm>
-#include <functional>
 #include <memory>
 #include <string>
-
-#include <image_proc/crop_decimate.hpp>
-#include <image_proc/utils.hpp>
-
-#include <opencv2/imgproc.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/image_encodings.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/msg/image.hpp>
+#include <thread>
 
 namespace image_proc
 {
@@ -108,8 +101,6 @@ void decimate(const cv::Mat & src, cv::Mat & dst, int decimation_x, int decimati
 CropDecimateNode::CropDecimateNode(const rclcpp::NodeOptions & options)
 : Node("CropNonZeroNode", options)
 {
-  auto qos_profile = getTopicQosProfile(this, "in/image_raw");
-
   queue_size_ = this->declare_parameter("queue_size", 5);
   target_frame_id_ = this->declare_parameter("target_frame_id", std::string());
 
@@ -127,11 +118,11 @@ CropDecimateNode::CropDecimateNode(const rclcpp::NodeOptions & options)
   int interpolation = this->declare_parameter("interpolation", 0);
   interpolation_ = static_cast<CropDecimateModes>(interpolation);
 
-  pub_ = image_transport::create_camera_publisher(this, "out/image_raw", qos_profile);
+  pub_ = image_transport::create_camera_publisher(this, "out/image_raw");
   sub_ = image_transport::create_camera_subscription(
     this, "in/image_raw", std::bind(
       &CropDecimateNode::imageCb, this,
-      std::placeholders::_1, std::placeholders::_2), "raw", qos_profile);
+      std::placeholders::_1, std::placeholders::_2), "raw");
 }
 
 void CropDecimateNode::imageCb(

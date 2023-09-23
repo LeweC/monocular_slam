@@ -8,7 +8,7 @@ import std_msgs.msg as std_msgs
 from cv_bridge import CvBridge  # Package to convert between ROS and OpenCV Images
 import cv2
 import torch  # ToDO: Make sure to install Torch
-from slam_interfaces import FloatArray, FloatList
+from slam_interfaces.msg import FloatArray
 import numpy as np
 
 
@@ -21,7 +21,7 @@ class SlamNode(Node):
         self.image_sub = self.create_subscription(sensor_msgs.Image, "image_raw", self.image_callback, 10)
         self.pcd_publisher = self.create_publisher(sensor_msgs.PointCloud2, "pcl", 10)
         self.br = CvBridge()
-        self.pose = []
+        self.pose = [0.0,0.0,0.0]
         self.list_data = []
         self.points = []
         self.im_counter = 0
@@ -35,17 +35,17 @@ class SlamNode(Node):
         self.midas.eval()
         # Load transforms to resize and normalize the image
         self.midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
+        self.transform = self.midas_transforms.small_transform
 
     def set_new_pose(self, robo_pos):
         """ToDo DocString"""
-        self.pose = []
-        for lst in robo_pos.lists:
-            for e in lst.elements:
-                self.pose.append(e)
+        self.pose = [0.0, 0.0, 0.0]
+        self.pose = robo_pos
+
 
     def odometry_callback(self, msg):
         """ToDo DocString"""
-        self.set_new_pose(msg)
+        self.set_new_pose(msg.elements)
 
     def point_cloud(self, points, parent_frame):
         """ToDo DocString"""
@@ -95,11 +95,11 @@ class SlamNode(Node):
                 except:
                     winkel = 0
 
-                x = (np.sin(((current_robo_ori + winkel) * 20) * np.pi / 180) * myfloat) + current_robo_x
-                y = (np.cos(((current_robo_ori + winkel) * 20) * np.pi / 180) * myfloat) * current_robo_y
+                x = (np.sin(((current_robo_ori + (winkel * 20)) * np.pi / 180) * myfloat) + current_robo_x)  #Sin should end before myFLoat
+                y = (np.cos(((current_robo_ori + (winkel * 20)) * np.pi / 180) * myfloat) + current_robo_y)
                 point_list.append([x * 2, y * 2, 0])
 
-            for point in self.point_list:
+            for point in point_list:
                 self.points.append(point)
 
             pcd = self.point_cloud(np.asarray(self.points, dtype=float), "base_link")

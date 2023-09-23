@@ -1,28 +1,35 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package stereo_image_proc
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-3.0.0 (2022-04-29)
+2.3.0 (2022-12-04)
 ------------------
-* Fix the tests for stereo_image_proc.
-* Cleanup stereo_image_proc
-* Populate CameraInfo camera matrix in test fixture
-* Use with_default_policies
-* Improve formatting
-* Use SubscriptionOptions
-* Add subscriber qos overrides
-* Remove QosPolicyKind::Invalid
-* Allow QoS overrides for publishers
 * Add missing test dependency
 * Add color param to stereo_image_proc (`#661 <https://github.com/ros-perception/image_pipeline/issues/661>`_)
-* changes per comments
+  * Add color param to point cloud node in stereo_image_proc
+  * Add test for point cloud node with color disabled
+  * Fix style issues
+  * Rename test node
+  * Remove repeated line
 * fix for stereo_image_proc_tests
 * Add maintainer (`#667 <https://github.com/ros-perception/image_pipeline/issues/667>`_)
 * Add disparity node parameters to launch file
+  This makes the launch file more flexible for including in other launch files.
 * Fix disparity node parameter name
+  Rename the parameter 'texture_ratio' to 'texture_threshold'.
+  The parameter was incorrectly named during the port from ROS 1 to ROS 2.
 * Expose avoid_point_cloud_padding parameter in stereo_image_proc launch file (`#599 <https://github.com/ros-perception/image_pipeline/issues/599>`_)
 * Refactor image_proc and stereo_image_proc launch files (`#583 <https://github.com/ros-perception/image_pipeline/issues/583>`_)
-* Contributors: Audrow Nash, Chris Lalancette, Jacob Perron, Patrick Musau, Rebecca Butler
+  * Allow passing container name to image_proc launch file
+  If a container name is provided, then load the image_proc nodes
+  into that container. Otherwise, launch a container to load the nodes into.
+  * Include the image_proc launch file in the stereo_image_proc launch file
+  This resolves a TODO, making the launch file have similar behavior as the version from ROS 1.
+  Also expose a new launch argument for optionally providing a container (similar to image_proc's launch file).
+  * Minor refactor to stereo_image_proc launch file
+  * Fix lint errors
+  Removing vestigial imports.
+  * Rename namespace launch arguments
+  * Make image_proc nodes optional
+  Default to launching the image_proc nodes.
+  * Remap topics from stereo nodes based on namespace arguments
+* Contributors: Jacob Perron, Patrick Musau, Rebecca Butler
 
 2.2.1 (2020-08-27)
 ------------------

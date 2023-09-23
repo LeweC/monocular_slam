@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 #
 # Software License Agreement (BSD License)
 #
@@ -146,9 +146,9 @@ class CameraCheckerNode(Node):
         return self.mc.mkgray(msg)
 
     def image_corners(self, im):
-        (ok, corners, ids, b) = self.mc.get_corners(im)
+        (ok, corners, b) = self.mc.get_corners(im)
         if ok:
-            return corners, ids
+            return corners
         else:
             return None
 
@@ -156,9 +156,9 @@ class CameraCheckerNode(Node):
 
         (image, camera) = msg
         gray = self.mkgray(image)
-        C, ids = self.image_corners(gray)
+        C = self.image_corners(gray)
         if C is not None:
-            linearity_rms = self.mc.linear_error(C, ids, self.board)
+            linearity_rms = self.mc.linear_error(C, self.board)
 
             # Add in reprojection check
             image_points = C
@@ -189,8 +189,8 @@ class CameraCheckerNode(Node):
         lgray = self.mkgray(lmsg)
         rgray = self.mkgray(rmsg)
 
-        L, _ = self.image_corners(lgray)
-        R, _ = self.image_corners(rgray)
+        L = self.image_corners(lgray)
+        R = self.image_corners(rgray)
         if L is not None and R is not None:
             epipolar = self.sc.epipolar_error(L, R)
 

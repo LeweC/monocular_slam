@@ -18,6 +18,6 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["server_direction_node = server.server_direction_node:main"],
+        "console_scripts": ["server_direction_node = server.server_direction_node:main", "slam_node = server.slam_node:main"],
     },
 )

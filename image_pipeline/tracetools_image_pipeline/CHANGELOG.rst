@@ -2,12 +2,17 @@
 Changelog for package tracetools_image_pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.0.0 (2022-04-29)
+2.3.0 (2022-12-04)
 ------------------
+* Add initial CHANGELOG for tracetools_image_pipeline.
 * tracetools_image_pipeline version consistent with repo
 * Omit changelogfile
+  See https://github.com/ros-perception/image_pipeline/pull/717#discussion_r781637389
 * Deal with uncrustify and cpplint
 * Add tracetools_image_pipeline package to the pipeline
+  Add an LTTng tracing provider wrapper for image_pipeline
+  metapackage. Include tracepoints for two initial ROS 2
+  components: image_proc::RectifyNode and ResizeNode
 * Contributors: Víctor Mayoral Vilches
 
 2.2.1 (2020-08-27)

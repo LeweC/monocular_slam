@@ -1,18 +1,16 @@
 name: Basic Build Workflow
 
 on:
-  push:
-    branches: [rolling]
-  pull_request:
-    types: [opened, reopened, synchronize]
+  - pull_request
+  - push
 
 jobs:
-  build-rolling:
+  build-foxy:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
     container:
-      image: osrf/ros2:testing
+      image: ros:foxy-ros-base
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2

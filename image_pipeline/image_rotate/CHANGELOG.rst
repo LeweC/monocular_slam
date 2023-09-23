@@ -1,15 +1,11 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package image_rotate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-3.0.0 (2022-04-29)
+2.3.0 (2022-12-04)
 ------------------
-* Cleanup the image_rotate package.
-* Replace deprecated geometry2 headers
 * revert a293252
 * Replace deprecated geometry2 headers
+  tf2_geometry_msgs.h was deprecated in https://github.com/ros2/geometry2/pull/418
+  tf2_eigen.h was deprecated in https://github.com/ros2/geometry2/pull/413
 * Add maintainer (`#667 <https://github.com/ros-perception/image_pipeline/issues/667>`_)
-* Contributors: Chris Lalancette, Jacob Perron, Patrick Musau
+* Contributors: Jacob Perron, Patrick Musau
 
 2.2.1 (2020-08-27)
 ------------------

@@ -33,14 +33,15 @@
 #ifndef IMAGE_PROC__RECTIFY_HPP_
 #define IMAGE_PROC__RECTIFY_HPP_
 
-#include <mutex>
-
-#include "image_geometry/pinhole_camera_model.h"
-
-#include <image_transport/image_transport.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/msg/image.hpp>
+#include <image_transport/image_transport.hpp>
+#include <image_geometry/pinhole_camera_model.h>
+#include <cv_bridge/cv_bridge.h>
+
+#include <thread>
+#include <memory>
+#include <vector>
+#include <string>
 
 namespace image_proc
 {
@@ -62,7 +63,7 @@ private:
   // Processing state (note: only safe because we're using single-threaded NodeHandle!)
   image_geometry::PinholeCameraModel model_;
 
-  void subscribeToCamera(const rmw_qos_profile_t & qos_profile);
+  void subscribeToCamera();
   void imageCb(
     const sensor_msgs::msg::Image::ConstSharedPtr & image_msg,
     const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info_msg);

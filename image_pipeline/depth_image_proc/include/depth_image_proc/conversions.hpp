@@ -29,20 +29,15 @@
 // LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-
 #ifndef DEPTH_IMAGE_PROC__CONVERSIONS_HPP_
 #define DEPTH_IMAGE_PROC__CONVERSIONS_HPP_
 
-#include <limits>
-
-#include "image_geometry/pinhole_camera_model.h"
-
-#include <opencv2/core/mat.hpp>
-
-#include <depth_image_proc/depth_traits.hpp>
-#include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <sensor_msgs/msg/image.hpp>
-#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
+#include <image_geometry/pinhole_camera_model.h>
+#include <depth_image_proc/depth_traits.hpp>
+
+#include <limits>
 
 namespace depth_image_proc
 {

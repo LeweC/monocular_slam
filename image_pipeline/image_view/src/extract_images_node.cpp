@@ -46,20 +46,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <functional>
-#include <mutex>
-#include <string>
-
-#include "cv_bridge/cv_bridge.h"
-
 #include <opencv2/highgui/highgui.hpp>
 
 #include <rclcpp/rclcpp.hpp>
+#include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
 #include <boost/format.hpp>
+
+#include <mutex>
+#include <string>
 
 #include "image_view/extract_images_node.hpp"
 
@@ -73,8 +71,7 @@ ExtractImagesNode::ExtractImagesNode(const rclcpp::NodeOptions & options)
   auto topic = rclcpp::expand_topic_or_service_name(
     "image", this->get_name(), this->get_namespace());
 
-  this->declare_parameter<std::string>("transport", std::string("raw"));
-  std::string transport = this->get_parameter("transport").as_string();
+  std::string transport = this->declare_parameter("transport", std::string("raw"));
 
   sub_ = image_transport::create_subscription(
     this, topic, std::bind(
@@ -86,16 +83,14 @@ ExtractImagesNode::ExtractImagesNode(const rclcpp::NodeOptions & options)
   if (topics.find(topic) != topics.end()) {
     RCLCPP_WARN(
       this->get_logger(), "extract_images: image has not been remapped! "
-      "Typical command-line usage:\n\t$ ros2 run image_view extract_images "
-      "--ros-args -r image:=<image topic> -p transport:=<transport mode>");
+      "Typical command-line usage:\n\t$ ./extract_images image:=<image topic> [transport]");
   }
 
-  this->declare_parameter<std::string>("filename_format", std::string("frame%04i.jpg"));
-  std::string format_string = this->get_parameter("filename_format").as_string();
+  std::string format_string =
+    this->declare_parameter("filename_format", std::string("frame%04i.jpg"));
   filename_format_.parse(format_string);
 
-  this->declare_parameter<double>("sec_per_frame", 0.1);
-  sec_per_frame_ = this->get_parameter("sec_per_frame").as_double();
+  double sec_per_frame_ = this->declare_parameter("sec_per_frame", 0.1);
 
   RCLCPP_INFO(this->get_logger(), "Initialized sec per frame to %f", sec_per_frame_);
 }
