@@ -34,8 +34,8 @@ By combining depth estimation with visual odometry, our system performs monocula
 ## Proof of Work
 Before we started working doing the monocular SLAM live, we did a Proof of work to make sure our Idea would be able to achieve results.
 We took four pictures manually, over a span of 80 degrees, and used the same script for depth estimation. We saved the resulting depth values from that calculation in a file.\
-<img src="docs/001.PNG" width="500"> <img src="docs/002.PNG" width="500"> <img src="docs/003.PNG" width="500"> <img src="docs/004.PNG" width="500">
+<img src="docs/001.PNG" width="500"> <img src="docs/002.PNG" width="500"> <img src="docs/003.PNG" width="500"> <img src="docs/004.PNG" width="500">\
 Later we read that File in the Visualisation script. There we hard-coded the corresponding angle that each picture was taking in, did some triangulation, and sent the resulting pointcloud we created, to RViz.\
-<img src="docs/DepthMap.jpeg">
+<img src="docs/DepthMap.jpeg">\
 
 
