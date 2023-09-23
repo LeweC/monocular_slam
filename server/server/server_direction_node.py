@@ -1,36 +1,4 @@
-# Copyright 2011 Brown University Robotics.
-# Copyright 2017 Open Source Robotics Foundation, Inc.
-# All rights reserved.
-#
-# Software License Agreement (BSD License 2.0)
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above
-#    copyright notice, this list of conditions and the following
-#    disclaimer in the documentation and/or other materials provided
-#    with the distribution.
-#  * Neither the name of the Willow Garage nor the names of its
-#    contributors may be used to endorse or promote products derived
-#    from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
-
+# This Script is heavily inspired by: https://github.com/ros2/teleop_twist_keyboard/tree/dashing/
 import sys
 import threading
 from std_msgs.msg import String
@@ -42,9 +10,18 @@ else:
     import termios
     import tty
 
-
 def get_key(settings):
-    """ToDo DocString"""
+    """Get a key press from the user.
+
+    This function reads a single key press from the user. On Windows, it uses msvcrt.getwch() to get the key,
+    while on Linux, it sets the terminal to raw mode, reads one character from stdin, and then restores the terminal settings.
+
+    Args:
+        settings (termios): The original terminal settings.
+
+    Returns:
+        str: The key that was pressed.
+    """
     if sys.platform == "win32":
         # getwch() returns a string on Windows
         key = msvcrt.getwch()
@@ -55,23 +32,38 @@ def get_key(settings):
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
-
 def save_terminal_settings():
-    """ToDo DocString"""
+    """Save the current terminal settings.
+
+    This function saves the current terminal settings to be restored later.
+
+    Returns:
+        termios or None: The terminal settings on Linux or None on Windows.
+    """
     if sys.platform == "win32":
         return None
     return termios.tcgetattr(sys.stdin)
 
-
 def restore_terminal_settings(old_settings):
-    """ToDo DocString"""
+    """Restore the terminal settings.
+
+    This function restores the terminal settings to their original state.
+
+    Args:
+        old_settings (termios): The original terminal settings.
+    """
     if sys.platform == "win32":
         return
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
 
-
 def main():
-    """ToDo DocString"""
+    """Main entry point for the server_direction_node.
+
+    This function initializes the ROS 2 environment, creates a node, a publisher for cmd_vel messages,
+    and sets up a loop to read keyboard input and publish corresponding direction commands. It also handles
+    terminal settings to read single key presses.
+
+    """
     settings = save_terminal_settings()
 
     rclpy.init()
@@ -88,7 +80,7 @@ def main():
             msg.data = "Null"
             key = get_key(settings)
             print(type(key))
-            
+
             if key == "\x03":
                 break
             elif key == "A":
@@ -102,15 +94,12 @@ def main():
             else:
                 msg.data = "Null"
             pub.publish(msg)
-            
-
     finally:
         pub.publish(msg)
         rclpy.shutdown()
         spinner.join()
 
         restore_terminal_settings(settings)
-
 
 if __name__ == "__main__":
     main()

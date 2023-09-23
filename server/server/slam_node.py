@@ -1,4 +1,9 @@
-"""ToDo DocString"""
+"""This node subscribes to robot odometry and raw image data, processes the image to obtain depth information,
+and generates a 3D point cloud based on the odometry and depth data. It also publishes a robot pose marker
+for visualization in RViz.
+
+It uses the MiDaS (Mixed Data Supervision) model to estimate depth from the raw image data.
+"""
 import rclpy
 from rclpy.node import Node
 
@@ -13,7 +18,13 @@ import numpy as np
 
 
 class SlamNode(Node):
-    """ToDo DocString"""
+    """ROS2 Node for Simultaneous Localization and Mapping (SLAM).
+
+    This node subscribes to robot odometry and raw image data, processes the image to obtain depth information,
+    and generates a 3D point cloud based on the odometry and depth data. It also publishes a robot pose marker
+    for visualization in RViz.
+
+    The node utilizes the MiDaS (Mixed Data Supervision) model for depth estimation from raw image data"""
 
     def __init__(self):
         super().__init__("slam_node")
@@ -29,7 +40,7 @@ class SlamNode(Node):
         self.model_type = "MiDaS_small"  # MiDaS v2.1 - Small   (lowest accuracy, highest inference speed)
 
         self.midas = torch.hub.load("intel-isl/MiDaS", self.model_type)
-       
+
         # Move model to GPU if available
         self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         self.midas.to(self.device)
@@ -37,19 +48,49 @@ class SlamNode(Node):
         # Load transforms to resize and normalize the image
         self.midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
         self.transform = self.midas_transforms.small_transform
-        
+
     def set_new_pose(self, robo_pos):
-        """ToDo DocString"""
+        """Update the current robot pose based on received odometry data.
+
+        This method sets the current robot pose [x, y, yaw] based on the odometry data received from the robot.
+
+        Args:
+            robo_pos (list): A list containing [x, y, yaw] representing the robot's new pose.
+
+        Returns:
+            None
+        """
         self.pose = [0.0, 0.0, 0.0]
         self.pose = robo_pos
 
 
     def odometry_callback(self, msg):
-        """ToDo DocString"""
+        """Callback function to handle robot odometry data.
+
+        This method is called when robot odometry data is received. It updates the current robot pose based on the
+        received odometry data.
+
+        Args:
+            msg (slam_interfaces.msg.FloatArray): The robot odometry message containing [x, y, yaw] pose information.
+
+        Returns:
+            None
+        """
         self.set_new_pose(msg.elements)
 
     def point_cloud(self, points, parent_frame):
-        """ToDo DocString"""
+        """Convert a list of 3D points into a PointCloud2 message.
+
+        This method converts a list of 3D points into a PointCloud2 message, which is a standard ROS message type
+        used to represent point cloud data.
+
+        Args:
+            points (list): A list of 3D points as [x, y, z].
+            parent_frame (str): The name of the parent coordinate frame for the point cloud.
+
+        Returns:
+            sensor_msgs.PointCloud2: A PointCloud2 message representing the 3D points.
+        """
         # In a PointCloud2 message, the point cloud is stored as an byte
         # array. In order to unpack it, we also include some parameters
         # which desribes the size of each individual point.
@@ -83,7 +124,18 @@ class SlamNode(Node):
         )
 
     def get_position(self, curr_robo_pos, depth):
-        """ToDo DocString"""
+        """Compute 3D positions of points from depth data.
+
+        This method computes the 3D positions of points in the robot's local coordinate frame
+        based on depth measurements and the current robot pose.
+
+        Args:
+            curr_robo_pos (list): The current robot pose [x, y, yaw] in the world frame.
+            depth (list): Depth measurements corresponding to points.
+
+        Returns:
+            None
+        """
         point_list = []
         current_robo_x = curr_robo_pos[0]
         current_robo_y = curr_robo_pos[1]
@@ -108,12 +160,21 @@ class SlamNode(Node):
             self.pub_robo_pose(curr_robo_pos)
 
     def pub_robo_pose(self, robo_pos):
-        """ToDo DocString"""
+        """Publish a robot pose marker for visualization.
+
+        This method publishes a visualization marker representing the robot's pose in the
+        robot's local coordinate frame. The marker is typically used for visualization in
+        RViz or other visualization tools.
+
+        Args:
+            robo_pos (list): The robot's pose [x, y, yaw] in the robot's local coordinate frame.
+
+        Returns:
+            None
+        """
         msg = Marker()
         msg.header.frame_id = "base_link"
-        #msg.header.stamp = self.get_clock().now()
-        
-        msg.ns = "my_namespace" 
+        msg.ns = "my_namespace"
         msg.id = 0
         msg.type = Marker.ARROW
         msg.action = Marker.ADD
@@ -132,9 +193,19 @@ class SlamNode(Node):
         msg.color.g = 0.0
         msg.color.b = 0.0
         self.marker_publisher.publish(msg)
-    
+
     def get_depth(self, img):
-        """ToDo DocString"""
+        """Compute depth values from a raw image using the MiDaS model.
+
+        This method takes a raw image as input, preprocesses it, and uses the MiDaS model to compute depth values
+        for the image.
+
+        Args:
+            img (numpy.ndarray): The raw image as a NumPy array.
+
+        Returns:
+            numpy.ndarray: Depth values corresponding to the input image.
+        """
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # Apply input transforms
         input_batch = self.transform(img).to(self.device)
@@ -160,7 +231,18 @@ class SlamNode(Node):
         return depth_values
 
     def image_callback(self, image):
-        """ToDo DocString"""
+        """Callback function to handle raw image data.
+
+        This method is called when raw image data is received. It processes the image to obtain depth information
+        and uses the received odometry and depth data to generate a 3D point cloud. Additionally, it controls the
+        processing frequency of image data.
+
+        Args:
+            image (sensor_msgs.Image): The raw image data received as a ROS Image message.
+
+        Returns:
+            None
+        """
         if self.im_counter % 100:
             cv_image = self.br.imgmsg_to_cv2(image, image.encoding)
 
@@ -172,7 +254,18 @@ class SlamNode(Node):
 
 
 def main(args=None):
-    """ToDo DocString"""
+    """Main entry point for the SLAM node.
+
+    This function initializes the ROS 2 environment, creates an instance of the SlamNode class, and enters the
+    ROS 2 spin loop to handle incoming messages and execute the SLAM functionality. It also ensures proper
+    shutdown of the node when finished.
+
+    Args:
+        args (List[str]): Command-line arguments (not used).
+
+    Returns:
+        None
+    """
     rclpy.init(args=args)
 
     slam_node = SlamNode()
