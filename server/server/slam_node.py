@@ -83,6 +83,7 @@ class SlamNode(Node):
 
         This method converts a list of 3D points into a PointCloud2 message, which is a standard ROS message type
         used to represent point cloud data.
+        Inspired by: https://github.com/SebastianGrans/ROS2-Point-Cloud-Demo
 
         Args:
             points (list): A list of 3D points as [x, y, z].
@@ -148,8 +149,8 @@ class SlamNode(Node):
                 except:
                     winkel = 0
 
-                x = (np.sin(((current_robo_ori + (winkel * 20)) * np.pi / 180)) * myfloat ) + current_robo_x
-                y = (np.cos(((current_robo_ori + (winkel * 20)) * np.pi / 180)) * myfloat ) + current_robo_y
+                x = (np.cos(((current_robo_ori + (winkel * 20)) * np.pi / 180)) * myfloat ) + current_robo_x
+                y = (np.sin(((current_robo_ori + (winkel * 20)) * np.pi / 180)) * myfloat ) + current_robo_y
                 point_list.append([x * 2, y * 2, 0])
 
             for point in point_list:
