@@ -34,7 +34,8 @@ The robot_control package runs on the robot's Rasberry Pi and is used to control
 The server package runs on a computer on the same network as the Raspberry Pi. We use this to do some of the heavy lifting, so the robot does not need to load an NN or visualize and save the map. 
 For visualization, we use [RViz](http://wiki.ros.org/rviz). More specifically, we use a point cloud that we send via a message for RViz to display. 
 
-**Monocular SLAM**: 
+**Monocular SLAM**:
+SLAM stands for Simultaneous Localisation and Mapping and is a key concept in robotics, especially in relation to autonomous robots and self-driving vehicles. SLAM is a process in which a robot or autonomous system determines its own position in an unknown environment and simultaneously creates a map of that environment.
 By combining depth estimation with visual odometry, our system performs monocular SLAM, enabling the hardware platform to create maps of its environment while simultaneously localizing itself within those maps.
 
 ## Proof of Work
@@ -42,4 +43,4 @@ Before we started working on the live monocular SLAM, we did a proof of concept 
 We took four images manually over an 80-degree span and used the same script to estimate the depth. We saved the resulting depth values from this calculation in a file.\
 <img src="docs/001.PNG" width="500"> <img src="docs/002.PNG" width="500"> <img src="docs/003.PNG" width="500"> <img src="docs/004.PNG" width="500">\
 Later we read this file into the visualisation script. There we hard-coded the angle that each image was taken from, did some triangulation, and sent the resulting point cloud to RViz.\
-<img src="docs/DepthMap.PNG">\
+<img src="docs/DepthMap.PNG">
