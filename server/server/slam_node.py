@@ -4,7 +4,7 @@ from rclpy.node import Node
 
 import sensor_msgs.msg as sensor_msgs
 import std_msgs.msg as std_msgs
-
+from visualization_msgs.msg import Marker
 from cv_bridge import CvBridge  # Package to convert between ROS and OpenCV Images
 import cv2
 import torch  # ToDO: Make sure to install Torch
@@ -20,6 +20,7 @@ class SlamNode(Node):
         self.odometry_sub = self.create_subscription(FloatArray, "robo_pos", self.odometry_callback, 10)
         self.image_sub = self.create_subscription(sensor_msgs.Image, "image_raw", self.image_callback, 10)
         self.pcd_publisher = self.create_publisher(sensor_msgs.PointCloud2, "pcl", 10)
+        self.marker_publisher = self.create_publisher(Marker, "marker", 10)
         self.br = CvBridge()
         self.pose = [0.0,0.0,0.0]
         self.list_data = []
@@ -28,7 +29,7 @@ class SlamNode(Node):
         self.model_type = "MiDaS_small"  # MiDaS v2.1 - Small   (lowest accuracy, highest inference speed)
 
         self.midas = torch.hub.load("intel-isl/MiDaS", self.model_type)
-
+       
         # Move model to GPU if available
         self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         self.midas.to(self.device)
@@ -36,7 +37,7 @@ class SlamNode(Node):
         # Load transforms to resize and normalize the image
         self.midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
         self.transform = self.midas_transforms.small_transform
-
+        
     def set_new_pose(self, robo_pos):
         """ToDo DocString"""
         self.pose = [0.0, 0.0, 0.0]
@@ -95,8 +96,8 @@ class SlamNode(Node):
                 except:
                     winkel = 0
 
-                x = (np.sin(((current_robo_ori + (winkel * 20)) * np.pi / 180) * myfloat) + current_robo_x)  #Sin should end before myFLoat
-                y = (np.cos(((current_robo_ori + (winkel * 20)) * np.pi / 180) * myfloat) + current_robo_y)
+                x = (np.sin(((current_robo_ori + (winkel * 20)) * np.pi / 180)) * myfloat ) + current_robo_x
+                y = (np.cos(((current_robo_ori + (winkel * 20)) * np.pi / 180)) * myfloat ) + current_robo_y
                 point_list.append([x * 2, y * 2, 0])
 
             for point in point_list:
@@ -104,7 +105,34 @@ class SlamNode(Node):
 
             pcd = self.point_cloud(np.asarray(self.points, dtype=float), "base_link")
             self.pcd_publisher.publish(pcd)
+            self.pub_robo_pose(curr_robo_pos)
 
+    def pub_robo_pose(self, robo_pos):
+        """ToDo DocString"""
+        msg = Marker()
+        msg.header.frame_id = "base_link"
+        #msg.header.stamp = self.get_clock().now()
+        
+        msg.ns = "my_namespace" 
+        msg.id = 0
+        msg.type = Marker.ARROW
+        msg.action = Marker.ADD
+        msg.pose.position.x = robo_pos[0]
+        msg.pose.position.y = robo_pos[1]
+        msg.pose.position.z = 0.0
+        msg.pose.orientation.x = 0.0
+        msg.pose.orientation.y = 0.0
+        msg.pose.orientation.z = float(robo_pos[2]*np.pi/180)
+        msg.pose.orientation.w = 1.0
+        msg.scale.x = 0.1
+        msg.scale.y = 0.1
+        msg.scale.z = 0.1
+        msg.color.a = 1.0
+        msg.color.r = 1.0
+        msg.color.g = 0.0
+        msg.color.b = 0.0
+        self.marker_publisher.publish(msg)
+    
     def get_depth(self, img):
         """ToDo DocString"""
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -133,7 +161,7 @@ class SlamNode(Node):
 
     def image_callback(self, image):
         """ToDo DocString"""
-        if self.im_counter % 10:
+        if self.im_counter % 100:
             cv_image = self.br.imgmsg_to_cv2(image, image.encoding)
 
             depth = self.get_depth(cv_image)
