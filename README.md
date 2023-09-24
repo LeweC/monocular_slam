@@ -16,9 +16,14 @@ Due to the fact that we used the ROS framework and some open source packages, th
 ## Key features
 
 **MIDAS Depth Estimation**: 
-We use the MIDAS model, a deep neural network designed for monocular depth estimation, to produce accurate depth maps from a single camera feed.
+We use the MiDaS monocular depth estimation model, a convolutional neural network (CNN), which allows us to extract depth range and scale information from a single camera image. We use the MiDaS model version "v2.1 small", which runs five times faster than the regular model and allows real-time processing, so we can use it on our roboter.
+The model was trained on 10 datasets, which were combined even if their annotations were incompatible. What helped this model outperform other monocular depth estimators is that, in addition to training by combining existing datasets, a new source was used: 3D movies. They provide high quality video images in all kinds of environments and content. To check the quality of the results, a so-called "zero-shot cross-dataset transfer" was used. This means that after training the model, it is tested on other datasets that were never seen during training. The idea is that this is a better example of real world performance. Midas also introduced a new loss function in their paper that helps outperform similar models.\
 
-**ROS 2 Integration: 
+References:
+- Ranftl, René, et al. "Towards robust monocular depth estimation: Mixing datasets for zero-shot cross-dataset transfer." IEEE transactions on pattern analysis and machine intelligence 44.3 (2020): 1623-1637
+- Ranftl, René, Alexey Bochkovskiy, and Vladlen Koltun. "Vision transformers for dense prediction." Proceedings of the IEEE/CVF international conference on computer vision. 2021.
+
+**ROS 2 Integration**: 
 The project is based on the ROS 2 framework, which provides a flexible and modular architecture for robotics applications. We are using ROS 2 primarily to provide seamless communication between the different components of the system, making it easier to develop, test and deploy.
 The ROS 2 framework is great for the project because there are a few things we do not have to worry about when using ROS:
 - Networking and communication between the robot and a computer: With ROS2 they just need to be on the same network and we can send ROS messages between them.
