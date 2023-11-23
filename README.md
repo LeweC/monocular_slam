@@ -49,3 +49,7 @@ We took four images manually over an 80-degree span and used the same script to 
 <img src="docs/001.PNG" width="500"> <img src="docs/002.PNG" width="500"> <img src="docs/003.PNG" width="500"> <img src="docs/004.PNG" width="500">\
 Later we read this file into the visualisation script. There we hard-coded the angle that each image was taken from, did some triangulation, and sent the resulting point cloud to RViz.\
 <img src="docs/DepthMap.PNG">
+
+
+Project by:
+Johann Czarkowski, Patricia Waldmann, Christopher Böhm and Lewe Christiansen
